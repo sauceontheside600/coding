@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1a3c1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Golf Shot Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green-dark: #1a3c1a;
+      --green-mid: #2d5a2d;
+      --green-light: #3d7a3d;
+      --green-bright: #4a9c4a;
+      --fairway: #6b9e6b;
+      --sand: #e8d5a3;
+      --white: #f5f5f0;
+      --text: #1a1a1a;
+      --text-muted: #5a5a5a;
+      --shadow: rgba(0,0,0,0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, var(--green-dark) 0%, var(--green-mid) 50%, #234323 100%);
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--white);
+      overflow-x: hidden;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 16px;
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .hole-display {
+      font-size: 0.95rem;
+      opacity: 0.9;
+      margin-top: 6px;
+    }
+
+    /* Main action: record shot */
+    .record-section {
+      margin: 28px 0;
+    }
+
+    .btn-record {
+      display: block;
+      width: 100%;
+      padding: 20px 24px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--green-dark);
+      background: var(--sand);
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--shadow);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+
+    .btn-record:active {
+      transform: scale(0.98);
+    }
+
+    /* Club picker modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      color: var(--text);
+      width: 100%;
+      max-width: 480px;
+      max-height: 85vh;
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 40px;
+      padding-bottom: calc(40px + env(safe-area-inset-bottom));
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal h2 {
+      margin: 0 0 20px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .club-categories {
+      overflow-y: auto;
+      flex: 1;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .club-category {
+      margin-bottom: 24px;
+    }
+
+    .club-category-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      padding-left: 4px;
+    }
+
+    .club-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+      gap: 10px;
+    }
+
+    .club-btn {
+      padding: 14px 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: inherit;
+      color: var(--text);
+      background: #e8e8e0;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .club-btn:hover,
+    .club-btn:focus {
+      background: #d8d8d0;
+    }
+
+    .club-btn:active {
+      background: var(--green-light);
+      color: var(--white);
+      border-color: var(--green-mid);
+    }
+
+    .club-btn.selected {
+      background: var(--green-mid);
+      color: var(--white);
+      border-color: var(--green-dark);
+    }
+
+    /* Binary step (Crisp / Positive Outcome) */
+    .modal-step {
+      display: none;
+      flex-direction: column;
+      min-height: 120px;
+    }
+
+    .modal-step.visible {
+      display: flex;
+    }
+
+    .modal-step .step-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .modal-step .step-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .binary-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .binary-btn {
+      padding: 18px 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: 2px solid #ddd;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .binary-btn-yes {
+      background: var(--green-mid);
+      color: var(--white);
+      border-color: var(--green-dark);
+    }
+
+    .binary-btn-yes:active {
+      background: var(--green-dark);
+    }
+
+    .binary-btn-no {
+      background: #e8e8e0;
+      color: var(--text);
+    }
+
+    .binary-btn-no:active {
+      background: #d0d0c8;
+    }
+
+    .modal .club-categories {
+      display: block;
+    }
+
+    .modal .club-categories.hidden {
+      display: none;
+    }
+
+    /* Current hole shots */
+    .shots-this-hole {
+      margin: 20px 0;
+      padding: 16px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+    }
+
+    .shots-this-hole h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+      opacity: 0.9;
+    }
+
+    .shot-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .shot-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .shot-chip .shot-num {
+      opacity: 0.8;
+      font-size: 0.75rem;
+    }
+
+    .shot-chip .shot-result {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-left: 4px;
+    }
+
+    /* Round summary */
+    .round-section {
+      margin-top: 28px;
+    }
+
+    .round-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .round-summary {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .hole-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.9rem;
+    }
+
+    .hole-row:last-child {
+      border-bottom: none;
+    }
+
+    .hole-row .hole-num {
+      font-weight: 600;
+      min-width: 48px;
+    }
+
+    .hole-row .hole-shots {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .hole-row .hole-shots span {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .total-row {
+      padding: 14px 16px;
+      font-weight: 600;
+      background: rgba(0,0,0,0.2);
+    }
+
+    /* Navigation */
+    .nav-holes {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .nav-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.4);
+      background: transparent;
+      color: var(--white);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .nav-btn:not(:disabled):active {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .new-round-btn {
+      display: block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      font-weight: 500;
+      color: var(--white);
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .new-round-btn:active {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.95rem;
+    }
+
+    /* Performance by club */
+    .club-stats-section {
+      margin-top: 28px;
+    }
+
+    .club-stats-section h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0 0 12px;
+    }
+
+    .club-stat-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .club-stat-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .club-stat-name {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .club-stat-name .club-total {
+      font-size: 0.85rem;
+      font-weight: 500;
+      opacity: 0.85;
+    }
+
+    .club-stats-headers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 0 16px 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .club-stat-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .club-stat-metric {
+      font-size: 0.85rem;
+    }
+
+    .club-stat-metric .metric-value {
+      font-weight: 600;
+    }
+
+    .club-stat-metric .metric-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    .club-stat-metric .metric-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.2s;
+    }
+
+    .club-stat-metric .metric-bar-fill.crisp { background: var(--green-bright); }
+    .club-stat-metric .metric-bar-fill.outcome { background: var(--sand); }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Golf Shot Tracker</h1>
+      <p class="hole-display">Hole <span id="current-hole">1</span> of 18</p>
+    </header>
+
+    <section class="record-section">
+      <button type="button" class="btn-record" id="btn-record-shot">+ Record shot</button>
+    </section>
+
+    <section class="shots-this-hole">
+      <h3>Shots on this hole</h3>
+      <div class="shot-list" id="shot-list">
+        <span class="empty-state" id="empty-hole">No shots yet. Tap above to record.</span>
+      </div>
+    </section>
+
+    <div class="nav-holes">
+      <button type="button" class="nav-btn" id="btn-prev-hole" aria-label="Previous hole">←</button>
+      <span id="hole-indicator">Hole 1</span>
+      <button type="button" class="nav-btn" id="btn-next-hole" aria-label="Next hole">→</button>
+    </div>
+
+    <section class="round-section">
+      <h3>Round summary <span id="total-shots-label">(0 shots)</span></h3>
+      <div class="round-summary" id="round-summary">
+        <div class="empty-state" id="empty-round">Your round summary will appear here.</div>
+      </div>
+      <button type="button" class="new-round-btn" id="btn-new-round">Start new round</button>
+    </section>
+
+    <section class="club-stats-section">
+      <h3>Performance by club</h3>
+      <div class="club-stats-headers" id="club-stats-headers" style="display: none;">
+        <span>Crisp</span>
+        <span>Outcome</span>
+      </div>
+      <div id="club-stats-container">
+        <div class="empty-state" id="empty-club-stats">Stats for each club will appear here after you record shots.</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Club picker + result modal -->
+  <div class="modal-overlay" id="club-modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <div class="modal">
+      <h2 id="modal-title">Which club did you use?</h2>
+
+      <div class="club-categories" id="club-categories">
+        <div class="club-category">
+          <div class="club-category-title">Driver & woods</div>
+          <div class="club-grid" id="clubs-driver-woods"></div>
+        </div>
+        <div class="club-category">
+          <div class="club-category-title">Hybrids</div>
+          <div class="club-grid" id="clubs-hybrids"></div>
+        </div>
+        <div class="club-category">
+          <div class="club-category-title">Irons</div>
+          <div class="club-grid" id="clubs-irons"></div>
+        </div>
+        <div class="club-category">
+          <div class="club-category-title">Wedges</div>
+          <div class="club-grid" id="clubs-wedges"></div>
+        </div>
+        <div class="club-category">
+          <div class="club-category-title">Putter</div>
+          <div class="club-grid" id="clubs-putter"></div>
+        </div>
+      </div>
+
+      <div class="modal-step" id="step-crisp">
+        <div class="step-title">Crisp</div>
+        <div class="step-subtitle">Was the shot hit well from a contact and trajectory standpoint?</div>
+        <div class="binary-buttons">
+          <button type="button" class="binary-btn binary-btn-yes" id="crisp-yes">Yes</button>
+          <button type="button" class="binary-btn binary-btn-no" id="crisp-no">No</button>
+        </div>
+      </div>
+
+      <div class="modal-step" id="step-outcome">
+        <div class="step-title">Positive Outcome</div>
+        <div class="step-subtitle">Was the result of the shot what you intended?</div>
+        <div class="binary-buttons">
+          <button type="button" class="binary-btn binary-btn-yes" id="outcome-yes">Yes</button>
+          <button type="button" class="binary-btn binary-btn-no" id="outcome-no">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const CLUBS = {
+      driverWoods: ['Driver', '3W', '5W', '7W', '9W'],
+      hybrids: ['2H', '3H', '4H', '5H'],
+      irons: ['3', '4', '5', '6', '7', '8', '9'],
+      wedges: ['PW', 'GW', 'SW', 'LW'],
+      putter: ['Putter']
+    };
+
+    const STORAGE_KEY = 'golf-shot-tracker-round';
+
+    let state = {
+      currentHole: 1,
+      holes: Array.from({ length: 18 }, () => []),
+      selectedClub: null,
+      pendingShot: null
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state.holes = parsed.holes || state.holes;
+          state.currentHole = Math.min(Math.max(1, parsed.currentHole || 1), 18);
+        }
+      } catch (e) {
+        console.warn('Could not load saved round', e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          holes: state.holes,
+          currentHole: state.currentHole
+        }));
+      } catch (e) {
+        console.warn('Could not save round', e);
+      }
+    }
+
+    function renderClubButtons() {
+      const containers = {
+        'clubs-driver-woods': CLUBS.driverWoods,
+        'clubs-hybrids': CLUBS.hybrids,
+        'clubs-irons': CLUBS.irons.map(i => i + 'i'),
+        'clubs-wedges': CLUBS.wedges,
+        'clubs-putter': CLUBS.putter
+      };
+
+      for (const [id, clubs] of Object.entries(containers)) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.innerHTML = clubs.map(club => `
+          <button type="button" class="club-btn" data-club="${club}">${club}</button>
+        `).join('');
+
+        el.querySelectorAll('.club-btn').forEach(btn => {
+          btn.addEventListener('click', () => selectClub(btn.dataset.club));
+        });
+      }
+    }
+
+    function selectClub(club) {
+      state.pendingShot = { club };
+      document.getElementById('club-categories').classList.add('hidden');
+      document.getElementById('step-crisp').classList.add('visible');
+      document.getElementById('step-outcome').classList.remove('visible');
+      document.getElementById('modal-title').textContent = 'Crisp';
+    }
+
+    function setCrisp(value) {
+      state.pendingShot.crisp = value;
+      document.getElementById('step-crisp').classList.remove('visible');
+      document.getElementById('step-outcome').classList.add('visible');
+      document.getElementById('modal-title').textContent = 'Positive Outcome';
+    }
+
+    function setOutcome(value) {
+      state.pendingShot.positiveOutcome = value;
+      const shots = state.holes[state.currentHole - 1];
+      shots.push(state.pendingShot);
+      state.pendingShot = null;
+      resetModalAndClose();
+      saveState();
+      renderAll();
+    }
+
+    function resetModalAndClose() {
+      const modal = document.getElementById('club-modal');
+      document.getElementById('club-categories').classList.remove('hidden');
+      document.getElementById('step-crisp').classList.remove('visible');
+      document.getElementById('step-outcome').classList.remove('visible');
+      document.getElementById('modal-title').textContent = 'Which club did you use?';
+      modal.classList.remove('open');
+    }
+
+    function openClubModal() {
+      state.pendingShot = null;
+      document.getElementById('club-categories').classList.remove('hidden');
+      document.getElementById('step-crisp').classList.remove('visible');
+      document.getElementById('step-outcome').classList.remove('visible');
+      document.getElementById('modal-title').textContent = 'Which club did you use?';
+      document.getElementById('club-modal').classList.add('open');
+    }
+
+    function closeModalOnOverlay(e) {
+      if (e.target.id === 'club-modal') {
+        state.pendingShot = null;
+        resetModalAndClose();
+      }
+    }
+
+    function formatShotResult(shot) {
+      if (shot.crisp === undefined && shot.positiveOutcome === undefined) return '';
+      const c = shot.crisp === true ? '✓' : shot.crisp === false ? '✗' : '—';
+      const o = shot.positiveOutcome === true ? '✓' : shot.positiveOutcome === false ? '✗' : '—';
+      return ` C:${c} O:${o}`;
+    }
+
+    const CLUB_ORDER = [
+      'Driver', '3W', '5W', '7W', '9W',
+      '2H', '3H', '4H', '5H',
+      '3i', '4i', '5i', '6i', '7i', '8i', '9i',
+      'PW', 'GW', 'SW', 'LW',
+      'Putter'
+    ];
+
+    function getStatsByClub() {
+      const byClub = {};
+      for (const holeShots of state.holes) {
+        for (const shot of holeShots) {
+          const club = shot.club;
+          if (!byClub[club]) {
+            byClub[club] = { total: 0, crispYes: 0, crispNo: 0, outcomeYes: 0, outcomeNo: 0 };
+          }
+          byClub[club].total++;
+          if (shot.crisp === true) byClub[club].crispYes++;
+          else if (shot.crisp === false) byClub[club].crispNo++;
+          if (shot.positiveOutcome === true) byClub[club].outcomeYes++;
+          else if (shot.positiveOutcome === false) byClub[club].outcomeNo++;
+        }
+      }
+      const ordered = CLUB_ORDER.filter(c => byClub[c]).map(c => ({ club: c, ...byClub[c] }));
+      const other = Object.keys(byClub).filter(c => !CLUB_ORDER.includes(c)).sort();
+      return ordered.concat(other.map(c => ({ club: c, ...byClub[c] })));
+    }
+
+    function renderClubStats() {
+      const container = document.getElementById('club-stats-container');
+      const emptyEl = document.getElementById('empty-club-stats');
+      const stats = getStatsByClub();
+
+      container.querySelectorAll('.club-stat-card').forEach(c => c.remove());
+
+      if (stats.length === 0) {
+        emptyEl.style.display = 'block';
+        document.getElementById('club-stats-headers').style.display = 'none';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      document.getElementById('club-stats-headers').style.display = 'grid';
+
+      for (const s of stats) {
+        const crispTotal = s.crispYes + s.crispNo;
+        const outcomeTotal = s.outcomeYes + s.outcomeNo;
+        const crispPct = crispTotal > 0 ? Math.round((s.crispYes / crispTotal) * 100) : null;
+        const outcomePct = outcomeTotal > 0 ? Math.round((s.outcomeYes / outcomeTotal) * 100) : null;
+
+        const card = document.createElement('div');
+        card.className = 'club-stat-card';
+        card.innerHTML = `
+          <div class="club-stat-name">
+            <span>${s.club}</span>
+            <span class="club-total">${s.total} shot${s.total !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="club-stat-metrics">
+            <div class="club-stat-metric">
+              <div class="metric-value">${crispTotal > 0 ? `${s.crispYes} / ${crispTotal} (${crispPct}%)` : '—'}</div>
+              <div class="metric-bar">${crispTotal > 0 ? `<div class="metric-bar-fill crisp" style="width:${crispPct}%"></div>` : ''}</div>
+            </div>
+            <div class="club-stat-metric">
+              <div class="metric-value">${outcomeTotal > 0 ? `${s.outcomeYes} / ${outcomeTotal} (${outcomePct}%)` : '—'}</div>
+              <div class="metric-bar">${outcomeTotal > 0 ? `<div class="metric-bar-fill outcome" style="width:${outcomePct}%"></div>` : ''}</div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    function renderAll() {
+      const hole = state.currentHole;
+      document.getElementById('current-hole').textContent = hole;
+      document.querySelector('#hole-indicator').textContent = `Hole ${hole}`;
+
+      const shotList = document.getElementById('shot-list');
+      const shots = state.holes[hole - 1];
+      const emptyEl = document.getElementById('empty-hole');
+
+      if (shots.length === 0) {
+        emptyEl.style.display = 'block';
+        shotList.querySelectorAll('.shot-chip').forEach(c => c.remove());
+      } else {
+        emptyEl.style.display = 'none';
+        shotList.querySelectorAll('.shot-chip').forEach(c => c.remove());
+        shots.forEach((s, i) => {
+          const chip = document.createElement('span');
+          chip.className = 'shot-chip';
+          const result = formatShotResult(s);
+          chip.innerHTML = `<span class="shot-num">#${i + 1}</span> ${s.club}<span class="shot-result">${result}</span>`;
+          shotList.appendChild(chip);
+        });
+      }
+
+      document.getElementById('btn-prev-hole').disabled = hole <= 1;
+      document.getElementById('btn-next-hole').disabled = hole >= 18;
+
+      const total = state.holes.reduce((sum, h) => sum + h.length, 0);
+      document.getElementById('total-shots-label').textContent = `(${total} shot${total !== 1 ? 's' : ''})`;
+
+      const summaryEl = document.getElementById('round-summary');
+      const emptyRound = document.getElementById('empty-round');
+      const hasAnyShots = state.holes.some(h => h.length > 0);
+
+      if (!hasAnyShots) {
+        emptyRound.style.display = 'block';
+        summaryEl.querySelectorAll('.hole-row, .total-row').forEach(r => r.remove());
+      } else {
+        emptyRound.style.display = 'none';
+        summaryEl.querySelectorAll('.hole-row, .total-row').forEach(r => r.remove());
+
+        for (let h = 1; h <= 18; h++) {
+          const row = document.createElement('div');
+          row.className = 'hole-row';
+          const holeShots = state.holes[h - 1];
+          const parts = holeShots.map(s => {
+            const r = formatShotResult(s);
+            return r ? `${s.club}${r}` : s.club;
+          });
+          row.innerHTML = `
+            <span class="hole-num">Hole ${h}</span>
+            <span class="hole-shots">${parts.join(' · ') || '—'}</span>
+          `;
+          summaryEl.appendChild(row);
+        }
+
+        const totalRow = document.createElement('div');
+        totalRow.className = 'total-row';
+        totalRow.innerHTML = `<span>Total shots</span><span>${total}</span>`;
+        summaryEl.appendChild(totalRow);
+      }
+
+      renderClubStats();
+    }
+
+    function prevHole() {
+      if (state.currentHole > 1) {
+        state.currentHole--;
+        saveState();
+        renderAll();
+      }
+    }
+
+    function nextHole() {
+      if (state.currentHole < 18) {
+        state.currentHole++;
+        saveState();
+        renderAll();
+      }
+    }
+
+    function newRound() {
+      if (state.holes.some(h => h.length > 0) && !confirm('Start a new round? Current round will be cleared.')) {
+        return;
+      }
+      state.holes = Array.from({ length: 18 }, () => []);
+      state.currentHole = 1;
+      saveState();
+      renderAll();
+    }
+
+    document.getElementById('btn-record-shot').addEventListener('click', openClubModal);
+    document.getElementById('club-modal').addEventListener('click', closeModalOnOverlay);
+    document.getElementById('crisp-yes').addEventListener('click', () => setCrisp(true));
+    document.getElementById('crisp-no').addEventListener('click', () => setCrisp(false));
+    document.getElementById('outcome-yes').addEventListener('click', () => setOutcome(true));
+    document.getElementById('outcome-no').addEventListener('click', () => setOutcome(false));
+    document.getElementById('btn-prev-hole').addEventListener('click', prevHole);
+    document.getElementById('btn-next-hole').addEventListener('click', nextHole);
+    document.getElementById('btn-new-round').addEventListener('click', newRound);
+
+    loadState();
+    renderClubButtons();
+    renderAll();
+  </script>
+</body>
+</html>
