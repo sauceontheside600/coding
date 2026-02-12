@@ -282,9 +282,7 @@
     }
 
     .binary-actions {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
+      display: block;
     }
 
     .binary-btn {
@@ -315,13 +313,6 @@
 
     .binary-btn-no:active {
       background: #d0d0c8;
-    }
-
-    .binary-btn-undo {
-      background: #f0f0ea;
-      color: var(--text);
-      border-color: #d5d5cc;
-      font-size: 0.95rem;
     }
 
     .modal .club-categories {
@@ -709,18 +700,38 @@
       opacity: 0.95;
     }
 
-    .putts-card select {
-      width: 96px;
-      padding: 10px;
+    .option-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .option-btn {
+      padding: 10px 12px;
       border-radius: 10px;
       border: 2px solid #c7c7c0;
+      background: #f7f7f2;
+      color: #1a1a1a;
       font-family: inherit;
       font-weight: 600;
+      cursor: pointer;
+      min-width: 44px;
+    }
+
+    .option-btn.active {
+      background: var(--green-mid);
+      color: var(--white);
+      border-color: var(--green-dark);
+    }
+
+    .option-btn:active {
+      transform: scale(0.98);
     }
 
     @media (max-width: 390px) {
       .app { padding: 10px 10px 18px; }
       .record-section { top: 68px; }
+      .record-actions { grid-template-columns: 1fr; }
       .btn-record { font-size: 0.95rem; }
       .compare-head, .compare-row { grid-template-columns: 70px 1fr 1fr; }
       .hole-row { font-size: 0.85rem; }
@@ -738,7 +749,6 @@
     }
 
     body.high-visibility .btn-record,
-    body.high-visibility .btn-penalty,
     body.high-visibility .binary-btn,
     body.high-visibility .nav-btn {
       box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
@@ -779,16 +789,8 @@
 
     <section class="putts-section">
       <div class="putts-card">
-        <label for="putts-select">Putts on current hole</label>
-        <select id="putts-select">
-          <option value="">—</option>
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
+        <label>Putts on current hole</label>
+        <div class="option-buttons" id="putts-buttons"></div>
       </div>
     </section>
 
@@ -799,7 +801,7 @@
     </div>
 
     <section class="round-section">
-      <h3>Round summary <span id="total-shots-label">(0 shots)</span></h3>
+      <h3>Round summary <span id="total-shots-label">0 shots</span></h3>
       <div class="round-summary" id="round-summary">
         <div class="empty-state" id="empty-round">Your round summary will appear here.</div>
       </div>
@@ -839,16 +841,16 @@
       <h3>Bets</h3>
       <div class="bet-card bet-controls">
         <div class="bet-row">
-          <label for="skins-winner">Skins winner (current hole)</label>
-          <select id="skins-winner"></select>
+          <label>Skins winner (current hole)</label>
+          <div class="option-buttons" id="skins-options"></div>
         </div>
         <div class="bet-row">
-          <label for="ctp-winner">Closest to pin winner (current hole)</label>
-          <select id="ctp-winner"></select>
+          <label>Closest to pin winner (current hole)</label>
+          <div class="option-buttons" id="ctp-options"></div>
         </div>
         <div class="bet-row">
-          <label for="ld-winner">Longest drive winner (current hole)</label>
-          <select id="ld-winner"></select>
+          <label>Longest drive winner (current hole)</label>
+          <div class="option-buttons" id="ld-options"></div>
         </div>
       </div>
       <div class="bet-card bet-totals" id="bet-totals"></div>
@@ -861,12 +863,6 @@
       <h2 id="modal-title">Which club did you use?</h2>
 
       <div class="club-categories" id="club-categories">
-        <div class="club-category">
-          <div class="club-category-title">Penalty</div>
-          <div class="club-grid">
-            <button type="button" class="club-btn" data-club="Penalty">Penalty stroke</button>
-          </div>
-        </div>
         <div class="club-category">
           <div class="club-category-title">Driver & woods</div>
           <div class="club-grid" id="clubs-driver-woods"></div>
@@ -883,6 +879,12 @@
           <div class="club-category-title">Wedges</div>
           <div class="club-grid" id="clubs-wedges"></div>
         </div>
+        <div class="club-category">
+          <div class="club-category-title">Penalty</div>
+          <div class="club-grid">
+            <button type="button" class="club-btn" data-club="Penalty">Penalty stroke</button>
+          </div>
+        </div>
       </div>
 
       <div class="modal-step" id="step-crisp">
@@ -892,7 +894,6 @@
             <button type="button" class="binary-btn binary-btn-yes" id="crisp-yes">Yes</button>
             <button type="button" class="binary-btn binary-btn-no" id="crisp-no">No</button>
           </div>
-          <button type="button" class="binary-btn binary-btn-undo" id="undo-to-club">Undo and reselect club</button>
         </div>
       </div>
 
@@ -903,7 +904,6 @@
             <button type="button" class="binary-btn binary-btn-yes" id="outcome-yes">Yes</button>
             <button type="button" class="binary-btn binary-btn-no" id="outcome-no">No</button>
           </div>
-          <button type="button" class="binary-btn binary-btn-undo" id="undo-to-crisp">Undo previous answer</button>
         </div>
       </div>
     </div>
@@ -1038,23 +1038,6 @@
       renderAll();
     }
 
-    function undoToClubSelection() {
-      if (!state.pendingShot) return;
-      delete state.pendingShot.crisp;
-      document.getElementById('step-crisp').classList.remove('visible');
-      document.getElementById('step-outcome').classList.remove('visible');
-      document.getElementById('club-categories').classList.remove('hidden');
-      document.getElementById('modal-title').textContent = 'Which club did you use?';
-    }
-
-    function undoToCrisp() {
-      if (!state.pendingShot) return;
-      delete state.pendingShot.positiveOutcome;
-      document.getElementById('step-outcome').classList.remove('visible');
-      document.getElementById('step-crisp').classList.add('visible');
-      document.getElementById('modal-title').textContent = 'Crisp';
-    }
-
     function resetModalAndClose() {
       const modal = document.getElementById('club-modal');
       document.getElementById('club-categories').classList.remove('hidden');
@@ -1082,10 +1065,10 @@
 
     function formatShotResult(shot) {
       if (shot.penalty) return ' PEN';
-      if (shot.crisp === undefined && shot.positiveOutcome === undefined) return '';
-      const c = shot.crisp === true ? '✓' : shot.crisp === false ? '✗' : '—';
-      const o = shot.positiveOutcome === true ? '✓' : shot.positiveOutcome === false ? '✗' : '—';
-      return ` C:${c} O:${o}`;
+      const flags = [];
+      if (shot.crisp === true) flags.push('C');
+      if (shot.positiveOutcome === true) flags.push('O');
+      return flags.length ? ` ${flags.join(' ')}` : '';
     }
 
     const CLUB_ORDER = [
@@ -1134,6 +1117,18 @@
       state.putts[state.currentHole - 1] = value;
       saveState();
       renderAll();
+    }
+
+    function renderPuttsButtons() {
+      const container = document.getElementById('putts-buttons');
+      const selected = String(state.putts[state.currentHole - 1] ?? '');
+      const values = ['0', '1', '2', '3', '4', '5'];
+      container.innerHTML = values
+        .map(v => `<button type="button" class="option-btn ${selected === v ? 'active' : ''}" data-putts="${v}">${v}</button>`)
+        .join('');
+      container.querySelectorAll('[data-putts]').forEach(btn => {
+        btn.addEventListener('click', () => setPutts(btn.getAttribute('data-putts') || ''));
+      });
     }
 
     function getStatsByClubFromHoles(holes) {
@@ -1277,21 +1272,31 @@
     }
 
     function renderBettingControls() {
-      const selects = [
-        { id: 'skins-winner', key: 'skinsWinner' },
-        { id: 'ctp-winner', key: 'ctpWinner' },
-        { id: 'ld-winner', key: 'ldWinner' }
+      const groups = [
+        { id: 'skins-options', key: 'skinsWinner', includePush: true },
+        { id: 'ctp-options', key: 'ctpWinner', includePush: false },
+        { id: 'ld-options', key: 'ldWinner', includePush: false }
       ];
       const holeBet = state.bets[state.currentHole - 1] || { skinsWinner: '', ctpWinner: '', ldWinner: '' };
-      const options = [''].concat(state.players);
-      selects.forEach(({ id, key }) => {
+      groups.forEach(({ id, key, includePush }) => {
         const el = document.getElementById(id);
-        let selectOptions = options.map(name => `<option value="${name}">${name || '— None —'}</option>`);
-        if (key === 'skinsWinner') {
-          selectOptions = selectOptions.concat(`<option value="${SKINS_PUSH_VALUE}">Push skin to next hole</option>`);
-        }
-        el.innerHTML = selectOptions.join('');
-        el.value = holeBet[key] || '';
+        const selected = holeBet[key] || '';
+        const base = [`<button type="button" class="option-btn ${selected === '' ? 'active' : ''}" data-bet-key="${key}" data-bet-value="">None</button>`]
+          .concat(
+            state.players.map(name => `<button type="button" class="option-btn ${selected === name ? 'active' : ''}" data-bet-key="${key}" data-bet-value="${name}">${name}</button>`)
+          );
+        const push = includePush
+          ? [`<button type="button" class="option-btn ${selected === SKINS_PUSH_VALUE ? 'active' : ''}" data-bet-key="${key}" data-bet-value="${SKINS_PUSH_VALUE}">Push</button>`]
+          : [];
+        el.innerHTML = base.concat(push).join('');
+        el.querySelectorAll('[data-bet-key]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const betKey = btn.getAttribute('data-bet-key') || '';
+            const betValue = btn.getAttribute('data-bet-value') || '';
+            updateBetSelection(betKey, betValue);
+            renderBettingControls();
+          });
+        });
       });
     }
 
@@ -1341,7 +1346,7 @@
       const shotList = document.getElementById('shot-list');
       const shots = state.holes[hole - 1];
       const emptyEl = document.getElementById('empty-hole');
-      document.getElementById('putts-select').value = String(state.putts[hole - 1] ?? '');
+      renderPuttsButtons();
 
       if (shots.length === 0) {
         emptyEl.style.display = 'block';
@@ -1361,8 +1366,10 @@
       document.getElementById('btn-prev-hole').disabled = hole <= 1;
       document.getElementById('btn-next-hole').disabled = hole >= 18;
 
-      const total = state.holes.reduce((sum, h) => sum + h.length, 0);
-      document.getElementById('total-shots-label').textContent = `(${total} shot${total !== 1 ? 's' : ''})`;
+      const swingTotal = state.holes.reduce((sum, h) => sum + h.length, 0);
+      const puttTotal = state.putts.reduce((sum, p) => sum + (p === '' || p === null || p === undefined ? 0 : Number(p)), 0);
+      const total = swingTotal + puttTotal;
+      document.getElementById('total-shots-label').textContent = `${total} shot${total !== 1 ? 's' : ''}`;
 
       const summaryEl = document.getElementById('round-summary');
       const emptyRound = document.getElementById('empty-round');
@@ -1394,10 +1401,15 @@
           summaryEl.appendChild(row);
         }
 
-        const totalRow = document.createElement('div');
-        totalRow.className = 'total-row';
-        totalRow.innerHTML = `<span>Total shots</span><span>${total}</span>`;
-        summaryEl.appendChild(totalRow);
+        const swingsRow = document.createElement('div');
+        swingsRow.className = 'total-row';
+        swingsRow.innerHTML = `<span>Total swings </span><span>${swingTotal}</span>`;
+        summaryEl.appendChild(swingsRow);
+
+        const puttsRow = document.createElement('div');
+        puttsRow.className = 'total-row';
+        puttsRow.innerHTML = `<span>Total putts </span><span>${puttTotal}</span>`;
+        summaryEl.appendChild(puttsRow);
       }
 
       renderClubStats();
@@ -1443,17 +1455,11 @@
     document.getElementById('club-modal').addEventListener('click', closeModalOnOverlay);
     document.getElementById('crisp-yes').addEventListener('click', () => setCrisp(true));
     document.getElementById('crisp-no').addEventListener('click', () => setCrisp(false));
-    document.getElementById('undo-to-club').addEventListener('click', undoToClubSelection);
     document.getElementById('outcome-yes').addEventListener('click', () => setOutcome(true));
     document.getElementById('outcome-no').addEventListener('click', () => setOutcome(false));
-    document.getElementById('undo-to-crisp').addEventListener('click', undoToCrisp);
     document.getElementById('btn-prev-hole').addEventListener('click', prevHole);
     document.getElementById('btn-next-hole').addEventListener('click', nextHole);
     document.getElementById('btn-new-round').addEventListener('click', newRound);
-    document.getElementById('putts-select').addEventListener('change', (e) => setPutts(e.target.value));
-    document.getElementById('skins-winner').addEventListener('change', (e) => updateBetSelection('skinsWinner', e.target.value));
-    document.getElementById('ctp-winner').addEventListener('change', (e) => updateBetSelection('ctpWinner', e.target.value));
-    document.getElementById('ld-winner').addEventListener('change', (e) => updateBetSelection('ldWinner', e.target.value));
 
     loadState();
     applyVisibilityMode();
