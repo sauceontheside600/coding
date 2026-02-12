@@ -22,6 +22,54 @@
       --text: #1a1a1a;
       --text-muted: #5a5a5a;
       --shadow: rgba(0,0,0,0.15);
+      --panel-bg: rgba(255,255,255,0.08);
+      --panel-border: rgba(255,255,255,0.18);
+      --control-bg: rgba(255,255,255,0.15);
+      --control-border: rgba(255,255,255,0.3);
+      --accent-primary: var(--sand);
+      --accent-primary-text: #1a3c1a;
+    }
+
+    body.high-visibility {
+      --green-dark: #0f2a0f;
+      --green-mid: #1c4b1f;
+      --green-light: #2f7a2f;
+      --green-bright: #66c266;
+      --white: #ffffff;
+      --panel-bg: rgba(0,0,0,0.35);
+      --panel-border: rgba(255,255,255,0.35);
+      --control-bg: rgba(255,255,255,0.22);
+      --control-border: rgba(255,255,255,0.55);
+      --shadow: rgba(0,0,0,0.35);
+      --accent-primary: #f3df7b;
+      --accent-primary-text: #173017;
+    }
+
+    body {
+      --green-dark: #0f3b1f;
+      --green-mid: #1f5d34;
+      --green-light: #2f7a4a;
+      --green-bright: #48a86d;
+      --sand: #f6e18a;
+      --panel-bg: rgba(255,255,255,0.12);
+      --panel-border: rgba(255,255,255,0.24);
+      --control-bg: rgba(255,255,255,0.18);
+      --control-border: rgba(255,255,255,0.35);
+      --accent-primary: #f6e18a;
+      --accent-primary-text: #12341f;
+    }
+
+    body.high-visibility {
+      --green-dark: #0b3019;
+      --green-mid: #1a5531;
+      --green-light: #2b7a4b;
+      --green-bright: #63bf84;
+      --panel-bg: rgba(0,0,0,0.34);
+      --panel-border: rgba(255,255,255,0.38);
+      --control-bg: rgba(255,255,255,0.24);
+      --control-border: rgba(255,255,255,0.62);
+      --accent-primary: #ffe88a;
+      --accent-primary-text: #102f1b;
     }
 
     * {
@@ -39,23 +87,29 @@
       color: var(--white);
       overflow-x: hidden;
       padding-bottom: env(safe-area-inset-bottom, 20px);
+      line-height: 1.35;
     }
 
     .app {
       max-width: 480px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px 12px 22px;
       min-height: 100vh;
     }
 
     header {
       text-align: center;
-      padding: 20px 0 24px;
+      padding: 14px 0 14px;
       border-bottom: 1px solid rgba(255,255,255,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: linear-gradient(180deg, rgba(26,60,26,0.97) 0%, rgba(45,90,45,0.95) 100%);
+      backdrop-filter: blur(4px);
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       font-weight: 700;
       margin: 0;
       letter-spacing: 0.02em;
@@ -69,27 +123,40 @@
 
     /* Main action: record shot */
     .record-section {
-      margin: 28px 0;
+      margin: 12px 0 14px;
+      position: sticky;
+      top: 74px;
+      z-index: 19;
+      padding-top: 6px;
+      padding-bottom: 8px;
+      background: linear-gradient(180deg, rgba(36,67,35,0.95) 0%, rgba(36,67,35,0.86) 65%, rgba(36,67,35,0) 100%);
+    }
+
+    .record-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
     }
 
     .btn-record {
       display: block;
       width: 100%;
-      padding: 20px 24px;
-      font-size: 1.25rem;
+      padding: 16px 16px;
+      font-size: 1.05rem;
       font-weight: 600;
       font-family: inherit;
-      color: var(--green-dark);
-      background: var(--sand);
+      color: var(--accent-primary-text);
+      background: var(--accent-primary);
       border: none;
       border-radius: 16px;
       cursor: pointer;
-      box-shadow: 0 4px 20px var(--shadow);
+      box-shadow: 0 3px 14px var(--shadow);
       transition: transform 0.1s, box-shadow 0.2s;
     }
 
     .btn-record:active {
       transform: scale(0.98);
+      filter: brightness(0.95);
     }
 
     /* Club picker modal */
@@ -129,8 +196,8 @@
     }
 
     .modal h2 {
-      margin: 0 0 20px;
-      font-size: 1.25rem;
+      margin: 0 0 12px;
+      font-size: 1.15rem;
       font-weight: 600;
       color: var(--text);
     }
@@ -157,12 +224,12 @@
 
     .club-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
     }
 
     .club-btn {
-      padding: 14px 10px;
+      padding: 12px 10px;
       font-size: 0.95rem;
       font-weight: 500;
       font-family: inherit;
@@ -203,9 +270,9 @@
     }
 
     .modal-step .step-subtitle {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .binary-buttons {
@@ -214,9 +281,15 @@
       gap: 12px;
     }
 
+    .binary-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
     .binary-btn {
-      padding: 18px 20px;
-      font-size: 1.1rem;
+      padding: 16px 16px;
+      font-size: 1rem;
       font-weight: 600;
       font-family: inherit;
       border: 2px solid #ddd;
@@ -244,6 +317,13 @@
       background: #d0d0c8;
     }
 
+    .binary-btn-undo {
+      background: #f0f0ea;
+      color: var(--text);
+      border-color: #d5d5cc;
+      font-size: 0.95rem;
+    }
+
     .modal .club-categories {
       display: block;
     }
@@ -254,14 +334,15 @@
 
     /* Current hole shots */
     .shots-this-hole {
-      margin: 20px 0;
-      padding: 16px;
-      background: rgba(255,255,255,0.08);
+      margin: 10px 0;
+      padding: 12px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
       border-radius: 14px;
     }
 
     .shots-this-hole h3 {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin: 0 0 12px;
       opacity: 0.9;
@@ -277,7 +358,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 12px;
+      padding: 7px 10px;
       background: rgba(255,255,255,0.15);
       border-radius: 10px;
       font-size: 0.85rem;
@@ -297,11 +378,11 @@
 
     /* Round summary */
     .round-section {
-      margin-top: 28px;
+      margin-top: 16px;
     }
 
     .round-section h3 {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       margin: 0 0 12px;
       display: flex;
@@ -310,7 +391,8 @@
     }
 
     .round-summary {
-      background: rgba(255,255,255,0.08);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
       border-radius: 14px;
       overflow: hidden;
     }
@@ -319,7 +401,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
+      padding: 10px 12px;
       border-bottom: 1px solid rgba(255,255,255,0.08);
       font-size: 0.9rem;
     }
@@ -330,7 +412,7 @@
 
     .hole-row .hole-num {
       font-weight: 600;
-      min-width: 48px;
+      min-width: 58px;
     }
 
     .hole-row .hole-shots {
@@ -340,13 +422,30 @@
       justify-content: flex-end;
     }
 
+    .hole-badges {
+      display: inline-flex;
+      gap: 6px;
+      margin-left: 6px;
+      flex-wrap: wrap;
+    }
+
+    .hole-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(0,0,0,0.25);
+      white-space: nowrap;
+    }
+
     .hole-row .hole-shots span {
       font-size: 0.8rem;
       opacity: 0.9;
     }
 
     .total-row {
-      padding: 14px 16px;
+      padding: 10px 12px;
       font-weight: 600;
       background: rgba(0,0,0,0.2);
     }
@@ -357,12 +456,12 @@
       align-items: center;
       justify-content: center;
       gap: 16px;
-      margin: 20px 0;
+      margin: 12px 0;
     }
 
     .nav-btn {
-      width: 44px;
-      height: 44px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       border: 2px solid rgba(255,255,255,0.4);
       background: transparent;
@@ -387,14 +486,14 @@
     .new-round-btn {
       display: block;
       width: 100%;
-      margin-top: 16px;
-      padding: 14px;
+      margin-top: 12px;
+      padding: 12px;
       font-size: 0.95rem;
       font-family: inherit;
       font-weight: 500;
       color: var(--white);
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
       border-radius: 12px;
       cursor: pointer;
     }
@@ -403,29 +502,51 @@
       background: rgba(255,255,255,0.25);
     }
 
+    .players-controls {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .secondary-btn {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      color: var(--white);
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .secondary-btn:active {
+      background: rgba(255,255,255,0.22);
+    }
+
     .empty-state {
       text-align: center;
-      padding: 40px 20px;
+      padding: 22px 14px;
       color: rgba(255,255,255,0.7);
-      font-size: 0.95rem;
+      font-size: 0.88rem;
     }
 
     /* Performance by club */
     .club-stats-section {
-      margin-top: 28px;
+      margin-top: 16px;
     }
 
     .club-stats-section h3 {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       margin: 0 0 12px;
     }
 
     .club-stat-card {
-      background: rgba(255,255,255,0.08);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
       border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
     }
 
     .club-stat-card:last-child {
@@ -434,8 +555,8 @@
 
     .club-stat-name {
       font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 10px;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -451,7 +572,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      padding: 0 16px 8px;
+      padding: 0 8px 6px;
       font-size: 0.85rem;
       font-weight: 600;
       opacity: 0.9;
@@ -487,6 +608,153 @@
 
     .club-stat-metric .metric-bar-fill.crisp { background: var(--green-bright); }
     .club-stat-metric .metric-bar-fill.outcome { background: var(--sand); }
+
+    .compare-section,
+    .history-section,
+    .bets-section {
+      margin-top: 16px;
+    }
+
+    .compare-card,
+    .history-card,
+    .bet-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .compare-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .compare-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .compare-head {
+      opacity: 0.85;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr;
+      gap: 10px;
+    }
+
+    .history-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.9rem;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .history-row:last-child {
+      border-bottom: none;
+    }
+
+    .bet-controls .bet-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .bet-controls label {
+      font-size: 0.85rem;
+      opacity: 0.95;
+    }
+
+    .bet-controls select {
+      width: 100%;
+      padding: 12px 10px;
+      border-radius: 10px;
+      border: 2px solid #c7c7c0;
+      font-family: inherit;
+      font-weight: 600;
+    }
+
+    .bet-totals .totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      padding: 6px 0;
+    }
+
+    .putts-section {
+      margin-top: 12px;
+    }
+
+    .putts-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .putts-card label {
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+
+    .putts-card select {
+      width: 96px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #c7c7c0;
+      font-family: inherit;
+      font-weight: 600;
+    }
+
+    @media (max-width: 390px) {
+      .app { padding: 10px 10px 18px; }
+      .record-section { top: 68px; }
+      .btn-record { font-size: 0.95rem; }
+      .compare-head, .compare-row { grid-template-columns: 70px 1fr 1fr; }
+      .hole-row { font-size: 0.85rem; }
+      .hole-row .hole-shots { font-size: 0.75rem; }
+    }
+
+    body.high-visibility h1 {
+      font-size: 1.45rem;
+    }
+
+    body.high-visibility .hole-display {
+      font-size: 1.02rem;
+      font-weight: 600;
+      opacity: 1;
+    }
+
+    body.high-visibility .btn-record,
+    body.high-visibility .btn-penalty,
+    body.high-visibility .binary-btn,
+    body.high-visibility .nav-btn {
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.2);
+      font-weight: 700;
+    }
+
+    body.high-visibility .shot-chip {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.3);
+      font-weight: 600;
+    }
+
+    body .hole-badge {
+      background: rgba(122, 0, 35, 0.45);
+      border-color: rgba(255,255,255,0.45);
+    }
   </style>
 </head>
 <body>
@@ -497,13 +765,30 @@
     </header>
 
     <section class="record-section">
-      <button type="button" class="btn-record" id="btn-record-shot">+ Record shot</button>
+      <div class="record-actions">
+        <button type="button" class="btn-record" id="btn-record-shot">+ Record shot</button>
+      </div>
     </section>
 
     <section class="shots-this-hole">
       <h3>Shots on this hole</h3>
       <div class="shot-list" id="shot-list">
         <span class="empty-state" id="empty-hole">No shots yet. Tap above to record.</span>
+      </div>
+    </section>
+
+    <section class="putts-section">
+      <div class="putts-card">
+        <label for="putts-select">Putts on current hole</label>
+        <select id="putts-select">
+          <option value="">—</option>
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
       </div>
     </section>
 
@@ -519,6 +804,10 @@
         <div class="empty-state" id="empty-round">Your round summary will appear here.</div>
       </div>
       <button type="button" class="new-round-btn" id="btn-new-round">Start new round</button>
+      <div class="players-controls">
+        <button type="button" class="secondary-btn" id="btn-set-players">Set players</button>
+        <button type="button" class="secondary-btn" id="btn-visibility-mode" style="margin-left:8px;">High visibility: Off</button>
+      </div>
     </section>
 
     <section class="club-stats-section">
@@ -531,6 +820,39 @@
         <div class="empty-state" id="empty-club-stats">Stats for each club will appear here after you record shots.</div>
       </div>
     </section>
+
+    <section class="compare-section">
+      <h3>Current vs aggregate</h3>
+      <div id="compare-container">
+        <div class="empty-state" id="empty-compare">Play and save rounds to compare your current stats against aggregate history.</div>
+      </div>
+    </section>
+
+    <section class="history-section">
+      <h3>Past rounds</h3>
+      <div id="history-container">
+        <div class="empty-state" id="empty-history">No previous rounds yet.</div>
+      </div>
+    </section>
+
+    <section class="bets-section">
+      <h3>Bets</h3>
+      <div class="bet-card bet-controls">
+        <div class="bet-row">
+          <label for="skins-winner">Skins winner (current hole)</label>
+          <select id="skins-winner"></select>
+        </div>
+        <div class="bet-row">
+          <label for="ctp-winner">Closest to pin winner (current hole)</label>
+          <select id="ctp-winner"></select>
+        </div>
+        <div class="bet-row">
+          <label for="ld-winner">Longest drive winner (current hole)</label>
+          <select id="ld-winner"></select>
+        </div>
+      </div>
+      <div class="bet-card bet-totals" id="bet-totals"></div>
+    </section>
   </div>
 
   <!-- Club picker + result modal -->
@@ -539,6 +861,12 @@
       <h2 id="modal-title">Which club did you use?</h2>
 
       <div class="club-categories" id="club-categories">
+        <div class="club-category">
+          <div class="club-category-title">Penalty</div>
+          <div class="club-grid">
+            <button type="button" class="club-btn" data-club="Penalty">Penalty stroke</button>
+          </div>
+        </div>
         <div class="club-category">
           <div class="club-category-title">Driver & woods</div>
           <div class="club-grid" id="clubs-driver-woods"></div>
@@ -555,25 +883,27 @@
           <div class="club-category-title">Wedges</div>
           <div class="club-grid" id="clubs-wedges"></div>
         </div>
-        <div class="club-category">
-          <div class="club-category-title">Putter</div>
-          <div class="club-grid" id="clubs-putter"></div>
-        </div>
       </div>
 
       <div class="modal-step" id="step-crisp">
         <div class="step-subtitle">Was the shot hit well from a contact and trajectory standpoint?</div>
-        <div class="binary-buttons">
-          <button type="button" class="binary-btn binary-btn-yes" id="crisp-yes">Yes</button>
-          <button type="button" class="binary-btn binary-btn-no" id="crisp-no">No</button>
+        <div class="binary-actions">
+          <div class="binary-buttons">
+            <button type="button" class="binary-btn binary-btn-yes" id="crisp-yes">Yes</button>
+            <button type="button" class="binary-btn binary-btn-no" id="crisp-no">No</button>
+          </div>
+          <button type="button" class="binary-btn binary-btn-undo" id="undo-to-club">Undo and reselect club</button>
         </div>
       </div>
 
       <div class="modal-step" id="step-outcome">
         <div class="step-subtitle">Was the result of the shot what you intended?</div>
-        <div class="binary-buttons">
-          <button type="button" class="binary-btn binary-btn-yes" id="outcome-yes">Yes</button>
-          <button type="button" class="binary-btn binary-btn-no" id="outcome-no">No</button>
+        <div class="binary-actions">
+          <div class="binary-buttons">
+            <button type="button" class="binary-btn binary-btn-yes" id="outcome-yes">Yes</button>
+            <button type="button" class="binary-btn binary-btn-no" id="outcome-no">No</button>
+          </div>
+          <button type="button" class="binary-btn binary-btn-undo" id="undo-to-crisp">Undo previous answer</button>
         </div>
       </div>
     </div>
@@ -584,17 +914,25 @@
       driverWoods: ['Driver', '3W', '5W', '7W', '9W'],
       hybrids: ['2H', '3H', '4H', '5H'],
       irons: ['3', '4', '5', '6', '7', '8', '9'],
-      wedges: ['PW', 'GW', 'SW', 'LW'],
-      putter: ['Putter']
+      wedges: ['PW', 'GW', 'SW', 'LW']
     };
 
     const STORAGE_KEY = 'golf-shot-tracker-round';
+    const HISTORY_KEY = 'golf-shot-tracker-history';
+    const PLAYERS_KEY = 'golf-shot-tracker-players';
+    const VISIBILITY_KEY = 'golf-shot-tracker-visibility';
+    const SKINS_PUSH_VALUE = '__PUSH__';
 
     let state = {
       currentHole: 1,
       holes: Array.from({ length: 18 }, () => []),
+      bets: Array.from({ length: 18 }, () => ({ skinsWinner: '', ctpWinner: '', ldWinner: '' })),
+      putts: Array.from({ length: 18 }, () => ''),
       selectedClub: null,
-      pendingShot: null
+      pendingShot: null,
+      history: [],
+      players: [],
+      highVisibility: false
     };
 
     function loadState() {
@@ -603,8 +941,15 @@
         if (saved) {
           const parsed = JSON.parse(saved);
           state.holes = parsed.holes || state.holes;
+          state.bets = parsed.bets || state.bets;
+          state.putts = parsed.putts || state.putts;
           state.currentHole = Math.min(Math.max(1, parsed.currentHole || 1), 18);
         }
+        const historySaved = localStorage.getItem(HISTORY_KEY);
+        if (historySaved) state.history = JSON.parse(historySaved) || [];
+        const playersSaved = localStorage.getItem(PLAYERS_KEY);
+        if (playersSaved) state.players = JSON.parse(playersSaved) || [];
+        state.highVisibility = localStorage.getItem(VISIBILITY_KEY) === '1';
       } catch (e) {
         console.warn('Could not load saved round', e);
       }
@@ -614,11 +959,27 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           holes: state.holes,
+          bets: state.bets,
+          putts: state.putts,
           currentHole: state.currentHole
         }));
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(state.history));
+        localStorage.setItem(PLAYERS_KEY, JSON.stringify(state.players));
+        localStorage.setItem(VISIBILITY_KEY, state.highVisibility ? '1' : '0');
       } catch (e) {
         console.warn('Could not save round', e);
       }
+    }
+
+    function applyVisibilityMode() {
+      document.body.classList.toggle('high-visibility', state.highVisibility);
+      document.getElementById('btn-visibility-mode').textContent = `High visibility: ${state.highVisibility ? 'On' : 'Off'}`;
+    }
+
+    function toggleVisibilityMode() {
+      state.highVisibility = !state.highVisibility;
+      applyVisibilityMode();
+      saveState();
     }
 
     function renderClubButtons() {
@@ -626,8 +987,7 @@
         'clubs-driver-woods': CLUBS.driverWoods,
         'clubs-hybrids': CLUBS.hybrids,
         'clubs-irons': CLUBS.irons.map(i => i + 'i'),
-        'clubs-wedges': CLUBS.wedges,
-        'clubs-putter': CLUBS.putter
+        'clubs-wedges': CLUBS.wedges
       };
 
       for (const [id, clubs] of Object.entries(containers)) {
@@ -641,9 +1001,19 @@
           btn.addEventListener('click', () => selectClub(btn.dataset.club));
         });
       }
+      document.querySelectorAll('[data-club="Penalty"]').forEach(btn => {
+        btn.addEventListener('click', () => selectClub('Penalty'));
+      });
     }
 
     function selectClub(club) {
+      if (club === 'Penalty') {
+        state.holes[state.currentHole - 1].push({ club: 'Penalty', penalty: true });
+        resetModalAndClose();
+        saveState();
+        renderAll();
+        return;
+      }
       state.pendingShot = { club };
       document.getElementById('club-categories').classList.add('hidden');
       document.getElementById('step-crisp').classList.add('visible');
@@ -666,6 +1036,23 @@
       resetModalAndClose();
       saveState();
       renderAll();
+    }
+
+    function undoToClubSelection() {
+      if (!state.pendingShot) return;
+      delete state.pendingShot.crisp;
+      document.getElementById('step-crisp').classList.remove('visible');
+      document.getElementById('step-outcome').classList.remove('visible');
+      document.getElementById('club-categories').classList.remove('hidden');
+      document.getElementById('modal-title').textContent = 'Which club did you use?';
+    }
+
+    function undoToCrisp() {
+      if (!state.pendingShot) return;
+      delete state.pendingShot.positiveOutcome;
+      document.getElementById('step-outcome').classList.remove('visible');
+      document.getElementById('step-crisp').classList.add('visible');
+      document.getElementById('modal-title').textContent = 'Crisp';
     }
 
     function resetModalAndClose() {
@@ -694,6 +1081,7 @@
     }
 
     function formatShotResult(shot) {
+      if (shot.penalty) return ' PEN';
       if (shot.crisp === undefined && shot.positiveOutcome === undefined) return '';
       const c = shot.crisp === true ? '✓' : shot.crisp === false ? '✗' : '—';
       const o = shot.positiveOutcome === true ? '✓' : shot.positiveOutcome === false ? '✗' : '—';
@@ -705,12 +1093,52 @@
       '2H', '3H', '4H', '5H',
       '3i', '4i', '5i', '6i', '7i', '8i', '9i',
       'PW', 'GW', 'SW', 'LW',
-      'Putter'
+      'Penalty'
     ];
 
-    function getStatsByClub() {
+    function ensurePlayers() {
+      if (state.players.length > 0) return;
+      const input = prompt('Enter player names separated by commas (example: Alex, Sam, Jordan):');
+      if (!input) return;
+      const names = input.split(',').map(n => n.trim()).filter(Boolean);
+      state.players = names;
+      saveState();
+      renderBettingControls();
+      renderAll();
+    }
+
+    function setPlayers() {
+      const current = state.players.join(', ');
+      const input = prompt('Enter player names separated by commas:', current);
+      if (input === null) return;
+      const names = input.split(',').map(n => n.trim()).filter(Boolean);
+      state.players = names;
+      saveState();
+      renderBettingControls();
+      renderAll();
+    }
+
+    function getRoundSnapshot() {
+      const totalShots = state.holes.reduce((sum, h) => sum + h.length, 0);
+      if (totalShots === 0) return null;
+      return {
+        id: Date.now(),
+        date: new Date().toISOString(),
+        totalShots,
+        holes: JSON.parse(JSON.stringify(state.holes)),
+        putts: JSON.parse(JSON.stringify(state.putts))
+      };
+    }
+
+    function setPutts(value) {
+      state.putts[state.currentHole - 1] = value;
+      saveState();
+      renderAll();
+    }
+
+    function getStatsByClubFromHoles(holes) {
       const byClub = {};
-      for (const holeShots of state.holes) {
+      for (const holeShots of holes) {
         for (const shot of holeShots) {
           const club = shot.club;
           if (!byClub[club]) {
@@ -726,6 +1154,15 @@
       const ordered = CLUB_ORDER.filter(c => byClub[c]).map(c => ({ club: c, ...byClub[c] }));
       const other = Object.keys(byClub).filter(c => !CLUB_ORDER.includes(c)).sort();
       return ordered.concat(other.map(c => ({ club: c, ...byClub[c] })));
+    }
+
+    function getStatsByClub() {
+      return getStatsByClubFromHoles(state.holes);
+    }
+
+    function getAggregateStatsByClub() {
+      const holes = state.history.flatMap(r => r.holes || []);
+      return getStatsByClubFromHoles(holes);
     }
 
     function renderClubStats() {
@@ -772,6 +1209,130 @@
       }
     }
 
+    function renderCompareStats() {
+      const container = document.getElementById('compare-container');
+      const emptyEl = document.getElementById('empty-compare');
+      container.querySelectorAll('.compare-card').forEach(c => c.remove());
+
+      const current = getStatsByClub();
+      const aggregate = getAggregateStatsByClub();
+      if (current.length === 0 || aggregate.length === 0) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+
+      const aggregateMap = Object.fromEntries(aggregate.map(s => [s.club, s]));
+      for (const c of current) {
+        const a = aggregateMap[c.club];
+        if (!a) continue;
+        const crispCurrent = c.crispYes + c.crispNo > 0 ? Math.round((c.crispYes / (c.crispYes + c.crispNo)) * 100) : null;
+        const crispAgg = a.crispYes + a.crispNo > 0 ? Math.round((a.crispYes / (a.crispYes + a.crispNo)) * 100) : null;
+        const outCurrent = c.outcomeYes + c.outcomeNo > 0 ? Math.round((c.outcomeYes / (c.outcomeYes + c.outcomeNo)) * 100) : null;
+        const outAgg = a.outcomeYes + a.outcomeNo > 0 ? Math.round((a.outcomeYes / (a.outcomeYes + a.outcomeNo)) * 100) : null;
+
+        const card = document.createElement('div');
+        card.className = 'compare-card';
+        card.innerHTML = `
+          <div class="compare-head"><span>${c.club}</span><span>Current</span><span>Aggregate</span></div>
+          <div class="compare-row"><span>Crisp</span><span>${crispCurrent === null ? '—' : `${crispCurrent}%`}</span><span>${crispAgg === null ? '—' : `${crispAgg}%`}</span></div>
+          <div class="compare-row"><span>Outcome</span><span>${outCurrent === null ? '—' : `${outCurrent}%`}</span><span>${outAgg === null ? '—' : `${outAgg}%`}</span></div>
+        `;
+        container.appendChild(card);
+      }
+    }
+
+    function renderHistory() {
+      const container = document.getElementById('history-container');
+      const emptyEl = document.getElementById('empty-history');
+      container.querySelectorAll('.history-card').forEach(c => c.remove());
+      if (state.history.length === 0) {
+        emptyEl.style.display = 'block';
+        return;
+      }
+      emptyEl.style.display = 'none';
+      const card = document.createElement('div');
+      card.className = 'history-card';
+      card.innerHTML = state.history
+        .slice()
+        .sort((a, b) => b.id - a.id)
+        .map(r => {
+          const date = new Date(r.date).toLocaleDateString();
+          const roundPutts = Array.isArray(r.putts)
+            ? r.putts.reduce((sum, p) => sum + (p === '' || p === null || p === undefined ? 0 : Number(p)), 0)
+            : 0;
+          const holesWithPutts = Array.isArray(r.putts)
+            ? r.putts.filter(p => p !== '' && p !== null && p !== undefined).length
+            : 0;
+          const avgPutts = holesWithPutts > 0 ? (roundPutts / holesWithPutts).toFixed(1) : '—';
+          return `
+            <div class="history-row">
+              <span>${date}</span>
+              <span>${r.totalShots} shots | ${roundPutts} putts | Avg ${avgPutts}</span>
+            </div>
+          `;
+        })
+        .join('');
+      container.appendChild(card);
+    }
+
+    function renderBettingControls() {
+      const selects = [
+        { id: 'skins-winner', key: 'skinsWinner' },
+        { id: 'ctp-winner', key: 'ctpWinner' },
+        { id: 'ld-winner', key: 'ldWinner' }
+      ];
+      const holeBet = state.bets[state.currentHole - 1] || { skinsWinner: '', ctpWinner: '', ldWinner: '' };
+      const options = [''].concat(state.players);
+      selects.forEach(({ id, key }) => {
+        const el = document.getElementById(id);
+        let selectOptions = options.map(name => `<option value="${name}">${name || '— None —'}</option>`);
+        if (key === 'skinsWinner') {
+          selectOptions = selectOptions.concat(`<option value="${SKINS_PUSH_VALUE}">Push skin to next hole</option>`);
+        }
+        el.innerHTML = selectOptions.join('');
+        el.value = holeBet[key] || '';
+      });
+    }
+
+    function updateBetSelection(key, value) {
+      state.bets[state.currentHole - 1][key] = value;
+      saveState();
+      renderBetTotals();
+    }
+
+    function renderBetTotals() {
+      const totalsEl = document.getElementById('bet-totals');
+      if (state.players.length === 0) {
+        totalsEl.innerHTML = '<div class="empty-state" style="padding:10px 0;">Set players to track betting winners.</div>';
+        return;
+      }
+
+      const totals = {};
+      state.players.forEach(p => {
+        totals[p] = { skins: 0, ctp: 0, ld: 0 };
+      });
+      let carrySkins = 1;
+      state.bets.forEach(b => {
+        if (b.skinsWinner === SKINS_PUSH_VALUE) {
+          carrySkins++;
+        } else if (totals[b.skinsWinner]) {
+          totals[b.skinsWinner].skins += carrySkins;
+          carrySkins = 1;
+        } else {
+          carrySkins = 1;
+        }
+        if (totals[b.ctpWinner]) totals[b.ctpWinner].ctp++;
+        if (totals[b.ldWinner]) totals[b.ldWinner].ld++;
+      });
+
+      const totalsRows = state.players.map(p => `
+        <div class="totals-row"><span>${p}</span><span>Skins ${totals[p].skins} | CTP ${totals[p].ctp} | LD ${totals[p].ld}</span></div>
+      `).join('');
+      const carryNote = carrySkins > 1 ? `<div class="totals-row"><span>Pending skins carry</span><span>${carrySkins}</span></div>` : '';
+      totalsEl.innerHTML = totalsRows + carryNote;
+    }
+
     function renderAll() {
       const hole = state.currentHole;
       document.getElementById('current-hole').textContent = hole;
@@ -780,6 +1341,7 @@
       const shotList = document.getElementById('shot-list');
       const shots = state.holes[hole - 1];
       const emptyEl = document.getElementById('empty-hole');
+      document.getElementById('putts-select').value = String(state.putts[hole - 1] ?? '');
 
       if (shots.length === 0) {
         emptyEl.style.display = 'block';
@@ -817,13 +1379,17 @@
           const row = document.createElement('div');
           row.className = 'hole-row';
           const holeShots = state.holes[h - 1];
+          const badges = [];
+          if (state.bets[h - 1]?.skinsWinner === SKINS_PUSH_VALUE) badges.push('<span class="hole-badge">Skin pushed</span>');
+          const holePutts = state.putts[h - 1];
+          if (holePutts !== '' && holePutts !== null && holePutts !== undefined) badges.push(`<span class="hole-badge">Putts: ${holePutts}</span>`);
           const parts = holeShots.map(s => {
             const r = formatShotResult(s);
             return r ? `${s.club}${r}` : s.club;
           });
           row.innerHTML = `
             <span class="hole-num">Hole ${h}</span>
-            <span class="hole-shots">${parts.join(' · ') || '—'}</span>
+            <span class="hole-shots">${parts.join(' · ') || '—'}<span class="hole-badges">${badges.join('')}</span></span>
           `;
           summaryEl.appendChild(row);
         }
@@ -835,6 +1401,10 @@
       }
 
       renderClubStats();
+      renderCompareStats();
+      renderHistory();
+      renderBettingControls();
+      renderBetTotals();
     }
 
     function prevHole() {
@@ -857,23 +1427,37 @@
       if (state.holes.some(h => h.length > 0) && !confirm('Start a new round? Current round will be cleared.')) {
         return;
       }
+      const snapshot = getRoundSnapshot();
+      if (snapshot) state.history.push(snapshot);
       state.holes = Array.from({ length: 18 }, () => []);
+      state.bets = Array.from({ length: 18 }, () => ({ skinsWinner: '', ctpWinner: '', ldWinner: '' }));
+      state.putts = Array.from({ length: 18 }, () => '');
       state.currentHole = 1;
       saveState();
       renderAll();
     }
 
     document.getElementById('btn-record-shot').addEventListener('click', openClubModal);
+    document.getElementById('btn-set-players').addEventListener('click', setPlayers);
+    document.getElementById('btn-visibility-mode').addEventListener('click', toggleVisibilityMode);
     document.getElementById('club-modal').addEventListener('click', closeModalOnOverlay);
     document.getElementById('crisp-yes').addEventListener('click', () => setCrisp(true));
     document.getElementById('crisp-no').addEventListener('click', () => setCrisp(false));
+    document.getElementById('undo-to-club').addEventListener('click', undoToClubSelection);
     document.getElementById('outcome-yes').addEventListener('click', () => setOutcome(true));
     document.getElementById('outcome-no').addEventListener('click', () => setOutcome(false));
+    document.getElementById('undo-to-crisp').addEventListener('click', undoToCrisp);
     document.getElementById('btn-prev-hole').addEventListener('click', prevHole);
     document.getElementById('btn-next-hole').addEventListener('click', nextHole);
     document.getElementById('btn-new-round').addEventListener('click', newRound);
+    document.getElementById('putts-select').addEventListener('change', (e) => setPutts(e.target.value));
+    document.getElementById('skins-winner').addEventListener('change', (e) => updateBetSelection('skinsWinner', e.target.value));
+    document.getElementById('ctp-winner').addEventListener('change', (e) => updateBetSelection('ctpWinner', e.target.value));
+    document.getElementById('ld-winner').addEventListener('change', (e) => updateBetSelection('ldWinner', e.target.value));
 
     loadState();
+    applyVisibilityMode();
+    ensurePlayers();
     renderClubButtons();
     renderAll();
   </script>
