@@ -367,6 +367,68 @@
       margin-left: 4px;
     }
 
+    .shots-this-hole .undo-row {
+      margin-top: 10px;
+    }
+
+    .btn-undo-shot {
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--white);
+      background: var(--control-bg);
+      border: 1px solid var(--control-border);
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .btn-undo-shot:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn-undo-shot:not(:disabled):active {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .modal-back-btn {
+      flex-shrink: 0;
+      padding: 8px 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text);
+      background: #e8e8e0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .modal-back-btn:active {
+      background: #d8d8d0;
+    }
+
+    .modal-header-row h2 {
+      margin: 0;
+      flex: 1;
+    }
+
+    .hole-row.hole-row-clickable {
+      cursor: pointer;
+    }
+
+    .hole-row.hole-row-clickable:active {
+      background: rgba(255,255,255,0.06);
+    }
+
     /* Round summary */
     .round-section {
       margin-top: 16px;
@@ -785,6 +847,9 @@
       <div class="shot-list" id="shot-list">
         <span class="empty-state" id="empty-hole">No shots yet. Tap above to record.</span>
       </div>
+      <div class="undo-row">
+        <button type="button" class="btn-undo-shot" id="btn-undo-shot">Undo last shot</button>
+      </div>
     </section>
 
     <section class="putts-section">
@@ -860,7 +925,10 @@
   <!-- Club picker + result modal -->
   <div class="modal-overlay" id="club-modal" role="dialog" aria-labelledby="modal-title" aria-modal="true">
     <div class="modal">
-      <h2 id="modal-title">Which club did you use?</h2>
+      <div class="modal-header-row">
+        <button type="button" class="modal-back-btn" id="modal-back-btn">Back</button>
+        <h2 id="modal-title">Which club did you use?</h2>
+      </div>
 
       <div class="club-categories" id="club-categories">
         <div class="club-category">
@@ -911,8 +979,8 @@
 
   <script>
     const CLUBS = {
-      driverWoods: ['Driver', '3W', '5W', '7W', '9W'],
-      hybrids: ['2H', '3H', '4H', '5H'],
+      driverWoods: ['Driver', '2W', '3W', '4W', '5W', '7W', '9W'],
+      hybrids: ['2H', '3H', '4H', '5H', '6H', '7H'],
       irons: ['3', '4', '5', '6', '7', '8', '9'],
       wedges: ['PW', 'GW', 'SW', 'LW']
     };
@@ -1063,6 +1131,37 @@
       }
     }
 
+    function modalBack() {
+      if (document.getElementById('step-outcome').classList.contains('visible')) {
+        document.getElementById('step-outcome').classList.remove('visible');
+        document.getElementById('step-crisp').classList.add('visible');
+        document.getElementById('modal-title').textContent = 'Crisp';
+        return;
+      }
+      if (document.getElementById('step-crisp').classList.contains('visible')) {
+        state.pendingShot = null;
+        document.getElementById('step-crisp').classList.remove('visible');
+        document.getElementById('club-categories').classList.remove('hidden');
+        document.getElementById('modal-title').textContent = 'Which club did you use?';
+        return;
+      }
+      resetModalAndClose();
+    }
+
+    function undoLastShotOnCurrentHole() {
+      const holeShots = state.holes[state.currentHole - 1];
+      if (!holeShots || holeShots.length === 0) return;
+      holeShots.pop();
+      saveState();
+      renderAll();
+    }
+
+    function goToHole(holeNum) {
+      state.currentHole = holeNum;
+      saveState();
+      renderAll();
+    }
+
     function formatShotResult(shot) {
       if (shot.penalty) return ' PEN';
       const flags = [];
@@ -1072,8 +1171,8 @@
     }
 
     const CLUB_ORDER = [
-      'Driver', '3W', '5W', '7W', '9W',
-      '2H', '3H', '4H', '5H',
+      'Driver', '2W', '3W', '4W', '5W', '7W', '9W',
+      '2H', '3H', '4H', '5H', '6H', '7H',
       '3i', '4i', '5i', '6i', '7i', '8i', '9i',
       'PW', 'GW', 'SW', 'LW',
       'Penalty'
@@ -1363,6 +1462,8 @@
         });
       }
 
+      document.getElementById('btn-undo-shot').disabled = shots.length === 0;
+
       document.getElementById('btn-prev-hole').disabled = hole <= 1;
       document.getElementById('btn-next-hole').disabled = hole >= 18;
 
@@ -1384,7 +1485,8 @@
 
         for (let h = 1; h <= 18; h++) {
           const row = document.createElement('div');
-          row.className = 'hole-row';
+          row.className = 'hole-row hole-row-clickable';
+          row.setAttribute('data-hole', String(h));
           const holeShots = state.holes[h - 1];
           const badges = [];
           if (state.bets[h - 1]?.skinsWinner === SKINS_PUSH_VALUE) badges.push('<span class="hole-badge">Skin pushed</span>');
@@ -1398,6 +1500,7 @@
             <span class="hole-num">Hole ${h}</span>
             <span class="hole-shots">${parts.join(' · ') || '—'}<span class="hole-badges">${badges.join('')}</span></span>
           `;
+          row.addEventListener('click', () => goToHole(h));
           summaryEl.appendChild(row);
         }
 
@@ -1450,6 +1553,8 @@
     }
 
     document.getElementById('btn-record-shot').addEventListener('click', openClubModal);
+    document.getElementById('btn-undo-shot').addEventListener('click', undoLastShotOnCurrentHole);
+    document.getElementById('modal-back-btn').addEventListener('click', modalBack);
     document.getElementById('btn-set-players').addEventListener('click', setPlayers);
     document.getElementById('btn-visibility-mode').addEventListener('click', toggleVisibilityMode);
     document.getElementById('club-modal').addEventListener('click', closeModalOnOverlay);
